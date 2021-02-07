@@ -16,6 +16,9 @@ namespace LivingWorldMod
     {
         internal static bool debugMode = false;
         internal static readonly int villageGiftCooldownTime = 60 * 60 * 24; //24 IRL minutes (24 in game hours)
+        
+        internal static LivingWorldMod instance;
+        public LivingWorldMod() => instance = this;
 
         public override void PostUpdateEverything()
         {
@@ -44,7 +47,7 @@ namespace LivingWorldMod
                 priority = MusicPriority.Environment;
             }
         }
-
+        public static Effect CircleNoise;
         public override void Load()
         {
             #region Villager Related Method Swaps
@@ -55,8 +58,17 @@ namespace LivingWorldMod
             //Sets the Villager's townNPC value to true only for the duration of the AI method
             On.Terraria.NPC.AI_007_TownEntities += NPC_AI_007_TownEntities;
             #endregion
-        }
 
+            #region Shader loading
+             if (Main.netMode != NetmodeID.Server) {
+                 CircleNoise = instance.GetEffect("Effects/CircleNoise");
+             }
+            #endregion
+        }
+        public override void Unload()
+        {
+            CircleNoise = null;
+        }
         #region Method Swaps
         private int NPC_TypeToHeadIndex(On.Terraria.NPC.orig_TypeToHeadIndex orig, int type)
         {
